@@ -48,8 +48,3 @@
 !/two-hour/vendor/nocot_bench/datagen/banks/__init__.py
 !/two-hour/vendor/nocot_bench/datagen/banks/brew.py
 !/two-hour/vendor/nocot_bench/datagen/common.py
-
-# Keep the previously shared landing page as a pointer.
-!/ninety-minute/
-/ninety-minute/**
-!/ninety-minute/README.md
