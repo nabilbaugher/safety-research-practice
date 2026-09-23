@@ -1,6 +1,6 @@
 # Predictions
 
-Record Q1 before opening baseline results. Record Q2 after Q1, but before the follow-up. Preserve these entries; explain later updates in the video/slides.
+Record Q1 before opening baseline results, and Q2 before the follow-up. Preserve the original entries; explain later updates in the slides/recording. Aim for a few bullets (usually 100–150 words or fewer) and roughly five minutes per question. No minimum or strict word limit.
 
 ## Q1A
 
@@ -18,8 +18,8 @@ Observation I want to explain:
 
 Proposed explanation and plausible alternative:
 
-Experiment and predicted result:
+Experiment: what changes and what stays fixed:
 
-Which outcome would make me change my mind:
+Predicted outcome; outcomes favoring each explanation or leaving them unresolved:
 
-For final submission, copy these original entries into `AI_LOGS.md` without changing their wording.
+Submit this file as-is. Reference it from `AI_LOGS.md`; do not copy it there.

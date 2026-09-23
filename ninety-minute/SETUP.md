@@ -1,6 +1,6 @@
 # Setup and running experiments
 
-Run commands from this folder. The GPU path was tested on Linux, Python 3.11, one H100 PCIe 80 GB, with `Qwen/Qwen3-8B` revision `b968826d9c46dd6066d109eabc6255188de91218`. A100 operation has not been measured. CPU-only preparation, grading tests, and cached analysis also work on a laptop. Fresh installation is separate from the timed exercise.
+Run commands from this folder. The GPU path was tested on Linux, Python 3.11, one H100 PCIe 80 GB, with `Qwen/Qwen3-8B` revision `b968826d9c46dd6066d109eabc6255188de91218`. A participant also completed a fresh run on an A100 SXM4 40 GB; still smoke-test your own environment. CPU-only preparation, grading tests, and cached analysis also work on a laptop. Fresh installation is separate from the timed exercise.
 
 ## Before the clock
 
@@ -16,7 +16,7 @@ python -m unittest -v
 python starter.py run --config configs/smoke.json --output runs/smoke.jsonl
 ```
 
-The smoke run downloads/loads the pinned checkpoint and uses disjoint easy cases. Allow time and disk space for model/dependency downloads. Do not inspect the baseline cache before writing your Q1 prediction. Resolve installation or GPU problems before starting the 90-minute timer; an organizer should help with setup rather than count debugging against you.
+The smoke run downloads/loads the pinned checkpoint and uses disjoint easy cases. Allow time and disk space for model/dependency downloads. Do not inspect the baseline cache before writing your Q1 prediction. Resolve installation or GPU problems before starting the 120-minute timer; an organizer should help with setup rather than count debugging against you.
 
 A repeat run needs a **new output filename**: the runner refuses to overwrite or combine experiments. The model is loaded per invocation; this overhead is included in the measured command runtimes. No serving process needs to be left running.
 
@@ -43,7 +43,7 @@ or analyze the supplied baseline:
 python starter.py analyze cache/baseline.jsonl --output-dir analysis/baseline
 ```
 
-The analysis writes `SUMMARY.md`, `summary.json`, and, if Matplotlib is installed, `accuracy.png`. The JSON contains counts by difficulty and an exploratory paired bootstrap interval. All attempted problems remain in the accuracy denominator. A missing/invalid final answer or token-limit truncation counts as unsuccessful; extra working in the direct arm is reported separately from answer accuracy. Inspect raw outputs before trusting a summary.
+The analysis writes `SUMMARY.md`, `summary.json`, and, if Matplotlib is installed, `accuracy.png`. The plot shows 95% Wilson intervals for accuracy at each difficulty; the Markdown/JSON summaries include counts by difficulty and exploratory stratified paired bootstrap intervals for overall differences against `direct`. Marginal interval overlap is not a paired test of the difference. All attempted problems remain in the accuracy denominator. A missing/invalid final answer or token-limit truncation counts as unsuccessful; extra working in the direct arm is reported separately from answer accuracy. Inspect raw outputs before trusting a summary.
 
 ```bash
 python starter.py inspect cache/baseline.jsonl --arm direct --limit 3
@@ -87,8 +87,8 @@ This is an exploratory experiment. Intervals over sampled problems do not captur
 
 ## Finishing
 
-Stop the research and presentation work at 90 minutes and record your actual finish time. Prepare one small ZIP containing reproduction code/configuration and a completed [AI_LOGS.md](AI_LOGS.md), with bundled native AI-log exports if needed. Copy original predictions and pilot timing feedback into that document. Exclude model weights, checkpoints, environments, caches, downloaded datasets, large generated outputs, and the video file.
+Stop research and presentation work at 120 minutes and record your actual finish time. Follow the [submission file map](README.md#presentation-and-submission): include reproduction code, fresh raw results and metadata/source snapshots, analysis, slides, separate predictions/feedback files, and AI logs. Complete [AI_LOGS.md](AI_LOGS.md) as an index. Leave model weights, environments, model/download caches, bulky assets, and the video out of the ZIP.
 
 Upload the 1–2 minute recording to YouTube as **Unlisted**, check that anyone with the link can watch, and send its URL alongside the ZIP. Record the URL in `AI_LOGS.md` too. The [README](README.md) explains the final submission requirements.
 
-Administrative export, upload, sharing, transfer, and feedback can happen after the timer; record that time separately. Keep local research outputs for your own records. Download and verify needed files before terminating a rented GPU; merely closing SSH does not stop billing.
+Administrative export, upload, sharing, transfer, and feedback can happen after the timer; record that time separately. Download and verify your fresh raw research results, metadata/source snapshots, and other needed files before terminating a rented GPU; merely closing SSH does not stop billing.

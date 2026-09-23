@@ -1,5 +1,5 @@
 # Safety Research Practice
 
-These are helpful empirical safety research practice exercises designed to prepare one for take-homes for safety research and, in general, for empirical safety research work.
+Empirical safety research exercises for practicing research skills and preparing for take-homes.
 
-The [90-minute version](ninety-minute/README.md) is being released now as a pilot. It will be followed by a three-hour version and then a five-hour version, designed to be progressively more in-depth.
+The [two-hour exercise](ninety-minute/README.md) is available as a pilot. It will be followed by three-hour and five-hour versions, designed to be progressively more in-depth. The introductory exercise retains its original `ninety-minute/` folder name so existing links continue to work.

@@ -186,6 +186,18 @@ def paired_interval(a,b,seed=91):
     return [vals[49],vals[1949]]
 
 
+def wilson_interval(correct, n):
+    """Marginal 95% Wilson score interval for a binomial accuracy."""
+    if n <= 0 or not 0 <= correct <= n:
+        raise ValueError('Require n > 0 and 0 <= correct <= n.')
+    z=1.959963984540054
+    p=correct/n
+    denominator=1+z*z/n
+    center=(p+z*z/(2*n))/denominator
+    half=z*math.sqrt(p*(1-p)/n+z*z/(4*n*n))/denominator
+    return [max(0.,center-half), min(1.,center+half)]
+
+
 def analyze(path, output_dir, reference=None):
     rows=read_rows(path)
     if reference:
@@ -208,6 +220,8 @@ def analyze(path, output_dir, reference=None):
                valid=sum(r['valid'] for r in sub),truncated=sum(r['truncated'] for r in sub),
                direct_adherent=sum(r['direct_adherent'] for r in sub),
                mean_output_tokens=round(sum(r['output_tokens'] for r in sub)/len(sub),1))
+            if level != 'all':
+                counts[str(level)]['wilson_95']=wilson_interval(counts[str(level)]['correct'],len(sub))
         summary[arm]=counts
     contrasts={}
     if 'direct' in grouped:
@@ -219,25 +233,51 @@ def analyze(path, output_dir, reference=None):
             contrasts[arm+' minus direct']=dict(delta=sum(int(a[k]['correct'])-int(base[k]['correct']) for k in a)/len(a),
                                              bootstrap_95=paired_interval(a,base),n=len(a))
     result=dict(counts=summary,paired_contrasts=contrasts,
-                note='Exploratory 95% stratified paired bootstrap; covers sampled problems, not model/prompt uncertainty.')
+                note='Per-depth accuracy: marginal 95% Wilson intervals. Overall differences: 95% stratified paired bootstrap. '
+                     'Exploratory sampling intervals, not model/prompt or distribution-shift uncertainty. '
+                     'Marginal interval overlap is not a paired test; bootstrap intervals can collapse with uniform observed differences.')
     out=Path(output_dir);out.mkdir(parents=True,exist_ok=True)
     write_json(out/'summary.json',result)
     lines=['# Results','', '| Arm | Correct / total | Valid | Truncated | Strict direct format | Mean output tokens |',
            '| --- | --- | --- | --- | --- | --- |']
     for arm,levels in summary.items():
         s=levels['all'];lines.append(f"| {arm} | {s['correct']}/{s['n']} | {s['valid']} | {s['truncated']} | {s['direct_adherent']} | {s['mean_output_tokens']} |")
-    lines += ['', 'See summary.json for difficulty breakdowns and paired uncertainty intervals.']
+    lines += ['', '## Accuracy by difficulty', '',
+              '| Arm | Transformations | Correct / total | Accuracy | 95% Wilson interval |',
+              '| --- | --- | --- | --- | --- |']
+    for arm,levels in summary.items():
+        for level,s in levels.items():
+            if level=='all':continue
+            lo,hi=s['wilson_95']
+            lines.append(f"| {arm} | {level} | {s['correct']}/{s['n']} | {s['correct']/s['n']:.1%} | [{lo:.1%}, {hi:.1%}] |")
+    lines += ['', '## Overall paired differences', '',
+              '| Contrast | Matched problems | Difference (percentage points) | 95% paired bootstrap interval |',
+              '| --- | --- | --- | --- |']
+    for contrast,s in contrasts.items():
+        lo,hi=s['bootstrap_95']
+        lines.append(f"| {contrast} | {s['n']} | {100*s['delta']:+.1f} | [{100*lo:+.1f}, {100*hi:+.1f}] |")
+    if not contrasts:
+        lines += ['', 'No matched comparison against an arm named `direct` was available.']
+    lines += ['', result['note']]
     (out/'SUMMARY.md').write_text('\n'.join(lines)+'\n')
     try:
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-        fig,ax=plt.subplots(figsize=(7,4))
+        fig,ax=plt.subplots(figsize=(7.8,4.8))
         for arm,ls in summary.items():
             xs=[int(k) for k in ls if k!='all'];ys=[ls[str(k)]['correct']/ls[str(k)]['n'] for k in xs]
-            ax.plot(xs,ys,marker='o',label=arm)
-        ax.set(xlabel='Number of transformations',ylabel='Accuracy',ylim=(-.03,1.03),title='Matched problems, one Qwen checkpoint')
-        ax.legend();ax.grid(alpha=.2);fig.tight_layout();fig.savefig(out/'accuracy.png',dpi=170);plt.close(fig)
+            intervals=[ls[str(k)]['wilson_95'] for k in xs]
+            errors=[[max(0.,y-ci[0]) for y,ci in zip(ys,intervals)],
+                    [max(0.,ci[1]-y) for y,ci in zip(ys,intervals)]]
+            sizes={ls[str(k)]['n'] for k in xs}
+            label=f'{arm} (n={next(iter(sizes))} per depth)' if len(sizes)==1 else f'{arm} (n varies; see summary)'
+            ax.errorbar(xs,ys,yerr=errors,marker='o',capsize=4,label=label)
+        ax.set(xlabel='Number of transformations',ylabel='Accuracy',ylim=(-.03,1.03),title='Accuracy by condition and task depth')
+        ax.set_xticks(sorted({r['difficulty'] for r in rows}))
+        ax.legend();ax.grid(alpha=.2)
+        fig.text(.5,.02,'95% Wilson intervals per condition; paired differences are reported in SUMMARY.md.',ha='center',fontsize=9)
+        fig.tight_layout(rect=(0,.05,1,1));fig.savefig(out/'accuracy.png',dpi=170);plt.close(fig)
     except ImportError:
         print('Matplotlib unavailable; saved table and JSON.')
     print(json.dumps(result,indent=2))

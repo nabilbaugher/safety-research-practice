@@ -1,57 +1,43 @@
-# AI assistance and pilot record
+# Submission and AI-assistance index
 
-Complete this file and include it in your submission ZIP alongside the reproduction code. Preserve the full AI-assistance transcripts, either below or in bundled native exports referenced here. Instructions: [AI_LOGGING.md](AI_LOGGING.md).
+Complete this index and include the referenced files in your ZIP. Keep predictions in `PREDICTIONS.md` and timing/feedback in `PILOT_FEEDBACK.md`; do not duplicate them here. Export instructions: [AI_LOGGING.md](AI_LOGGING.md).
 
-## Recording
+## Recording and files
 
 Unlisted YouTube URL: [also send this link with the ZIP]
 
-Visibility set to Unlisted and link playback checked while signed out: [yes / pending]
+Visibility set to Unlisted and playback checked while signed out: [yes / pending]
+
+| Item | Bundled path or reference |
+| --- | --- |
+| Original predictions | `PREDICTIONS.md` |
+| Actual timing and feedback | `PILOT_FEEDBACK.md` |
+| Reproduction instructions and configurations | |
+| Fresh raw results, metadata, and source snapshots | |
+| Analysis summaries and figures | |
+| Slides and linked images | |
+| Supplied cached results reused | [filename and SHA-256 from the supplied `MANIFEST.json`, or none] |
+
+Known reproduction gaps or omitted results: [details, or none]
 
 ## AI assistance
 
 AI assistance used: [yes / no]
 
-| Tool | Model, if known | Session/branch ID | Phase: setup / timed / administrative | Transcript section or bundled export path | Missing content, if any |
+| Tool | Model, if known | Session/branch ID | Phase: setup / timed / administrative | Bundled export path or transcript section | Missing content, if any |
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-Subagent/continuation transcripts: [sections or paths, or none]
+Subagent/continuation transcripts: [paths or sections, or none]
 
-Task attachments needed to interpret the logs: [small bundled files, reproduction paths, or none]
+Task attachments needed to interpret the logs: [bundled paths, or none]
 
 Redactions: [what was removed and where, or none]
 
 Known export gaps: [details, or none; do not recreate missing logs]
 
-If no AI assistance was used, say so explicitly. Research-model calls are described by the reproduction code/configuration separately from coding/chat assistance.
+Research-model calls are recorded in the experiment outputs and metadata separately from coding/chat assistance.
 
-## Original predictions
+## Complete AI transcripts (if not bundled separately)
 
-Paste your original Q1A and Q2A entries from `PREDICTIONS.md`, including their recorded times. Preserve their original wording. Put subsequent changes in your video or transcripts rather than rewriting these predictions.
-
-## Actual timing and pilot feedback
-
-- Start date/time and timezone:
-- Finish date/time:
-- Actual elapsed minutes, including breaks/interruptions:
-- Breaks/interruptions within that interval:
-- Minutes beyond 90, if any, and work done afterward:
-- Approximate minutes by phase: context/prediction; baseline; follow-up; figures/slides; recording/checking:
-- Setup/download/logging/recording-check minutes outside the timer:
-- Administrative export/upload/transfer/feedback minutes after the timer:
-- How did the timing feel: comfortable / about right / rushed / not feasible? Why?
-- What was unfinished at your stopping point (and at minute 90 if you ran over)?
-- Where did you get stuck or lose time? What would improve the scope?
-
-You may paste your completed `PILOT_FEEDBACK.md` here instead of filling these prompts twice.
-
-## Reproduction notes
-
-Entry command or reproduction README path:
-
-Cached results reused, model/revision, seeds/settings, and anything unfinished: [brief note or paths to the code/configuration]
-
-## Complete AI transcripts
-
-Paste full task-related transcripts here, preserving message order, roles, timestamps, and tool calls/results where available. Include all relevant sessions and subagents, including unsuccessful attempts. Alternatively, reference the bundled native exports listed in the table above. Do not substitute summaries for the transcripts.
+Prefer native exports under `ai_logs/`, indexed above. Alternatively, paste complete task-related transcripts here, preserving message order, roles, timestamps, and available tool calls/results. Include unsuccessful attempts and all relevant sessions. Summaries do not replace transcripts.

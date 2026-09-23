@@ -2,6 +2,11 @@
 import unittest
 import copy
 import re
+import contextlib
+import io
+import json
+import tempfile
+from pathlib import Path
 import starter
 
 
@@ -57,5 +62,45 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(starter.paired_interval(a,b),[1,1])
         b.pop('0')
         with self.assertRaises(ValueError):starter.paired_interval(a,b)
+
+    def test_wilson_interval_including_boundary_accuracy(self):
+        # Standard 95% score interval for 12 successes out of 24.
+        lo,hi=starter.wilson_interval(12,24)
+        self.assertAlmostEqual(lo,0.314274,places=5)
+        self.assertAlmostEqual(hi,0.685726,places=5)
+        zero=starter.wilson_interval(0,24)
+        perfect=starter.wilson_interval(24,24)
+        self.assertAlmostEqual(zero[0],0)
+        self.assertAlmostEqual(zero[1],0.137976,places=5)
+        self.assertAlmostEqual(perfect[0],1-zero[1])
+        self.assertAlmostEqual(perfect[1],1)
+        for correct,n in [(0,0),(-1,24),(25,24)]:
+            with self.assertRaises(ValueError):starter.wilson_interval(correct,n)
+
+    def test_analysis_reports_uncertainty_without_dropping_failures(self):
+        rows=[]
+        for arm in ['direct','followup']:
+            for k in range(4):
+                raw='Answer: blue' if arm=='followup' or k==0 else 'unfinished'
+                finish='length' if arm=='direct' and k==3 else 'stop'
+                parsed=starter.parse_output(raw,False,finish)
+                rows.append(dict(id=f'{k}-{arm}',item_id=str(k),arm=arm,difficulty=1,
+                    gold='blue',raw=raw,thinking=False,finish_reason=finish,
+                    correct=parsed['answer']=='blue',output_tokens=5,**parsed))
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'results.jsonl'
+            path.write_text(''.join(json.dumps(r)+'\n' for r in rows))
+            with contextlib.redirect_stdout(io.StringIO()):
+                starter.analyze(path,Path(tmp)/'analysis')
+            summary=json.loads((Path(tmp)/'analysis/summary.json').read_text())
+            direct=summary['counts']['direct']['1']
+            self.assertEqual((direct['n'],direct['correct'],direct['valid'],direct['truncated']),(4,1,1,1))
+            self.assertLess(direct['wilson_95'][0],.25)
+            self.assertGreater(direct['wilson_95'][1],.25)
+            self.assertLess(summary['counts']['followup']['1']['wilson_95'][0],1)
+            self.assertEqual(summary['paired_contrasts']['followup minus direct']['delta'],.75)
+            markdown=(Path(tmp)/'analysis/SUMMARY.md').read_text()
+            self.assertIn('1/4',markdown)
+            self.assertIn('followup minus direct',markdown)
 
 if __name__=='__main__':unittest.main()

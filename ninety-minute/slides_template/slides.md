@@ -26,4 +26,4 @@ If one graph covers both questions, use slide 2 for a small results table or int
 
 **Finding:** [What I changed, what happened, and how uncertain it is]
 
-**Update / limitation:** [What this supports and what it leaves unresolved]
+**Update / limitation:** [What this supports, what remains unresolved, and any implication for oversight]
